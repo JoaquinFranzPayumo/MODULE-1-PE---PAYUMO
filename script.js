@@ -1,136 +1,136 @@
-// === Basic Setup ===
+// === Scene Setup ===
+// The "scene" is the virtual container for all objects, lights, and cameras.
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0xb0c4de); // soft blue background
+scene.background = new THREE.Color(0xbfd1e5); // soft sky blue background
 
+// === Camera Setup ===
+// PerspectiveCamera mimics how a human eye sees: fov, aspect ratio, near, far clipping plane.
 const camera = new THREE.PerspectiveCamera(
-  75,
-  window.innerWidth / window.innerHeight,
-  0.1,
-  1000
+  75,                                 // field of view
+  window.innerWidth / window.innerHeight, // aspect ratio
+  0.1,                                // near clipping
+  1000                                // far clipping
 );
-camera.position.set(8, 6, 12);
+camera.position.set(8, 6, 12); // move the camera back and slightly above
 
+// === Renderer ===
+// WebGLRenderer draws the scene to the screen using WebGL.
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
-// === Lighting ===
+// === Lights ===
+// AmbientLight = general soft light, fills shadows
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
 scene.add(ambientLight);
 
+// PointLight = like a light bulb. Bright in the middle, fades outward.
 const pointLight = new THREE.PointLight(0xffffff, 0.8);
 pointLight.position.set(5, 8, 5);
 scene.add(pointLight);
 
-// === Room (walls + floor + ceiling) ===
-const floorMaterial = new THREE.MeshLambertMaterial({ color: 0x87a7c4 }); // bluish floor
-const wallMaterial = new THREE.MeshLambertMaterial({ color: 0xe6f0fa }); // pale blue walls
+// === Room: Floor, Walls, Ceiling ===
+const roomGroup = new THREE.Group();
 
+// Floor (green tint for requirement)
+const floorMaterial = new THREE.MeshLambertMaterial({ color: 0x2e8b57 }); // green
 const floor = new THREE.Mesh(new THREE.BoxGeometry(20, 0.5, 20), floorMaterial);
 floor.position.y = -0.25;
-scene.add(floor);
+roomGroup.add(floor);
 
+// Walls (light blue tint for requirement)
 const wallHeight = 8;
 const wallThickness = 0.5;
+const wallMaterial = new THREE.MeshLambertMaterial({ color: 0x87ceeb }); // light sky blue
 
-// Back wall
-const backWall = new THREE.Mesh(new THREE.BoxGeometry(20, wallHeight, wallThickness), wallMaterial);
+// Back Wall
+const backWall = new THREE.Mesh(
+  new THREE.BoxGeometry(20, wallHeight, wallThickness),
+  wallMaterial
+);
 backWall.position.set(0, wallHeight / 2, -10);
-scene.add(backWall);
+roomGroup.add(backWall);
 
-// Left wall
-const leftWall = new THREE.Mesh(new THREE.BoxGeometry(wallThickness, wallHeight, 20), wallMaterial);
+// Left Wall
+const leftWall = new THREE.Mesh(
+  new THREE.BoxGeometry(wallThickness, wallHeight, 20),
+  wallMaterial
+);
 leftWall.position.set(-10, wallHeight / 2, 0);
-scene.add(leftWall);
+roomGroup.add(leftWall);
 
-// Right wall
-const rightWall = new THREE.Mesh(new THREE.BoxGeometry(wallThickness, wallHeight, 20), wallMaterial);
+// Right Wall
+const rightWall = new THREE.Mesh(
+  new THREE.BoxGeometry(wallThickness, wallHeight, 20),
+  wallMaterial
+);
 rightWall.position.set(10, wallHeight / 2, 0);
-scene.add(rightWall);
+roomGroup.add(rightWall);
 
 // Ceiling
-const ceiling = new THREE.Mesh(new THREE.BoxGeometry(20, wallThickness, 20), wallMaterial);
+const ceiling = new THREE.Mesh(
+  new THREE.BoxGeometry(20, wallThickness, 20),
+  wallMaterial
+);
 ceiling.position.set(0, wallHeight, 0);
-scene.add(ceiling);
+roomGroup.add(ceiling);
 
-// === Bed & Side Table ===
+scene.add(roomGroup);
+
+// === Bed ===
 const bedGroup = new THREE.Group();
 
+// Bed Frame
 const bedFrame = new THREE.Mesh(
   new THREE.BoxGeometry(6, 1, 3),
-  new THREE.MeshLambertMaterial({ color: 0x3b3b98 }) // deep blue wood frame
+  new THREE.MeshLambertMaterial({ color: 0x006400 }) // dark green
 );
 bedFrame.position.set(-5, 0.5, 0);
 bedGroup.add(bedFrame);
 
+// Mattress
 const mattress = new THREE.Mesh(
-  new THREE.BoxGeometry(6, 0.6, 3),
-  new THREE.MeshLambertMaterial({ color: 0xffffff })
+  new THREE.BoxGeometry(6, 0.5, 3),
+  new THREE.MeshLambertMaterial({ color: 0xffffff }) // white
 );
-mattress.position.set(-5, 1.3, 0);
+mattress.position.set(-5, 1.25, 0);
 bedGroup.add(mattress);
 
-const blanket = new THREE.Mesh(
-  new THREE.BoxGeometry(6, 0.2, 2),
-  new THREE.MeshLambertMaterial({ color: 0x4682b4 }) // steel blue blanket
-);
-blanket.position.set(-5, 1.5, 0.5);
-bedGroup.add(blanket);
-
+// Pillow
 const pillow = new THREE.Mesh(
   new THREE.BoxGeometry(1.5, 0.4, 1),
-  new THREE.MeshLambertMaterial({ color: 0xeeeeff })
+  new THREE.MeshLambertMaterial({ color: 0x87ceeb }) // blue pillow
 );
-pillow.position.set(-6.5, 1.6, 0);
+pillow.position.set(-6.5, 1.5, 0);
 bedGroup.add(pillow);
 
 scene.add(bedGroup);
 
-// Bedside table
-const sideTable = new THREE.Mesh(
-  new THREE.BoxGeometry(1.5, 1, 1.5),
-  new THREE.MeshLambertMaterial({ color: 0x2f4f4f })
-);
-sideTable.position.set(-1.5, 0.5, 2);
-scene.add(sideTable);
-
-const tableLampBase = new THREE.Mesh(
-  new THREE.CylinderGeometry(0.2, 0.2, 0.5),
-  new THREE.MeshLambertMaterial({ color: 0x000000 })
-);
-tableLampBase.position.set(-1.5, 1.25, 2);
-scene.add(tableLampBase);
-
-const tableLampShade = new THREE.Mesh(
-  new THREE.ConeGeometry(0.6, 1, 16),
-  new THREE.MeshLambertMaterial({ color: 0x1e90ff }) // vivid blue shade
-);
-tableLampShade.position.set(-1.5, 1.9, 2);
-scene.add(tableLampShade);
-
-// === Study Area ===
+// === Study Area: Desk + Chair + Monitor ===
 const deskGroup = new THREE.Group();
 
+// Desk Surface
 const desk = new THREE.Mesh(
   new THREE.BoxGeometry(4, 0.4, 2),
-  new THREE.MeshLambertMaterial({ color: 0x1a2b4c }) // navy desk
+  new THREE.MeshLambertMaterial({ color: 0x006699 }) // blue desk
 );
 desk.position.set(4, 2, 0);
 deskGroup.add(desk);
 
-// Legs
-function createDeskLeg(x, z) {
+// Desk Legs
+const deskLegMaterial = new THREE.MeshLambertMaterial({ color: 0x333333 });
+function makeDeskLeg(x, z) {
   const leg = new THREE.Mesh(
     new THREE.BoxGeometry(0.2, 2, 0.2),
-    new THREE.MeshLambertMaterial({ color: 0x1a2b4c })
+    deskLegMaterial
   );
   leg.position.set(x, 1, z);
   return leg;
 }
-deskGroup.add(createDeskLeg(2.2, -0.9));
-deskGroup.add(createDeskLeg(5.8, -0.9));
-deskGroup.add(createDeskLeg(2.2, 0.9));
-deskGroup.add(createDeskLeg(5.8, 0.9));
+deskGroup.add(makeDeskLeg(2.2, -0.9));
+deskGroup.add(makeDeskLeg(5.8, -0.9));
+deskGroup.add(makeDeskLeg(2.2, 0.9));
+deskGroup.add(makeDeskLeg(5.8, 0.9));
 
 // Monitor
 const monitor = new THREE.Mesh(
@@ -140,82 +140,70 @@ const monitor = new THREE.Mesh(
 monitor.position.set(4, 3, 0);
 deskGroup.add(monitor);
 
-// Keyboard
-const keyboard = new THREE.Mesh(
-  new THREE.BoxGeometry(1.5, 0.1, 0.5),
-  new THREE.MeshLambertMaterial({ color: 0xcccccc })
-);
-keyboard.position.set(4, 2.3, 0.6);
-deskGroup.add(keyboard);
-
 // Chair
 const chairSeat = new THREE.Mesh(
   new THREE.BoxGeometry(1.5, 0.2, 1.5),
-  new THREE.MeshLambertMaterial({ color: 0x1e3f66 })
+  new THREE.MeshLambertMaterial({ color: 0x2e8b57 }) // green chair
 );
 chairSeat.position.set(4, 1, -3);
 deskGroup.add(chairSeat);
 
 const chairBack = new THREE.Mesh(
   new THREE.BoxGeometry(1.5, 1.5, 0.2),
-  new THREE.MeshLambertMaterial({ color: 0x1e3f66 })
+  new THREE.MeshLambertMaterial({ color: 0x2e8b57 })
 );
 chairBack.position.set(4, 2, -3.6);
 deskGroup.add(chairBack);
 
 scene.add(deskGroup);
 
-// === Bookshelf ===
-const shelf = new THREE.Mesh(
-  new THREE.BoxGeometry(1, 5, 3),
-  new THREE.MeshLambertMaterial({ color: 0x2f4f4f })
-);
-shelf.position.set(8, 2.5, -6);
-scene.add(shelf);
-
-for (let i = 0; i < 3; i++) {
-  const book = new THREE.Mesh(
-    new THREE.BoxGeometry(0.8, 0.2, 2),
-    new THREE.MeshLambertMaterial({ color: 0x4169e1 })
-  );
-  book.position.set(8, 1 + i * 1.5, -6);
-  scene.add(book);
-}
-
-// === Window with multiple panes ===
+// === Window ===
 const windowFrame = new THREE.Mesh(
-  new THREE.BoxGeometry(5, 4, 0.2),
+  new THREE.BoxGeometry(4, 3, 0.2),
   new THREE.MeshLambertMaterial({ color: 0xaaaaaa })
 );
 windowFrame.position.set(0, 4, -9.9);
 scene.add(windowFrame);
 
 const windowGlass = new THREE.Mesh(
-  new THREE.BoxGeometry(4.6, 3.6, 0.1),
-  new THREE.MeshLambertMaterial({ color: 0x87ceeb, transparent: true, opacity: 0.6 })
+  new THREE.BoxGeometry(3.5, 2.5, 0.1),
+  new THREE.MeshLambertMaterial({
+    color: 0x87ceeb, // blue glass
+    transparent: true,
+    opacity: 0.6,
+  })
 );
 windowGlass.position.set(0, 4, -10);
 scene.add(windowGlass);
 
-// === Rug ===
-const rug = new THREE.Mesh(
-  new THREE.CylinderGeometry(3, 3, 0.1, 32),
-  new THREE.MeshLambertMaterial({ color: 0x5dade2 })
+// === Extra: Lamp ===
+const lampStand = new THREE.Mesh(
+  new THREE.CylinderGeometry(0.1, 0.1, 2),
+  new THREE.MeshLambertMaterial({ color: 0x000000 })
 );
-rug.rotation.x = -Math.PI / 2;
-rug.position.set(0, 0.05, 0);
-scene.add(rug);
+lampStand.position.set(-2, 2, 4);
+
+const lampShade = new THREE.Mesh(
+  new THREE.ConeGeometry(0.7, 1, 16),
+  new THREE.MeshLambertMaterial({ color: 0xffffaa })
+);
+lampShade.position.set(-2, 3, 4);
+
+scene.add(lampStand, lampShade);
 
 // === Animation Loop ===
+// requestAnimationFrame ensures the scene updates smoothly at monitor refresh rate.
 function animate() {
   requestAnimationFrame(animate);
   renderer.render(scene, camera);
 }
 animate();
 
-// === Responsiveness ===
+// === Responsive Resize ===
 window.addEventListener("resize", () => {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
 });
+
+
